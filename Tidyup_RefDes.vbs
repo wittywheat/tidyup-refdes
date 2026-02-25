@@ -24,7 +24,7 @@ Dim componentObj
 
 Dim PlaceOLColl
 Dim PlaceOLObj
-Dim ExtremaObj
+Dim CompExtremaObj, TextExtremaObj
 
 Dim outlineMaxX, outlineMaxY, outlineMinX, outlineMinY
 
@@ -41,20 +41,11 @@ For Each componentObj In componentColl
 	Set PlaceOLColl = componentObj.PlacementOutlines
 	If PlaceOLColl.Count = 1 Then
 		Set PlaceOLObj = PlaceOLColl(1)
-		Set ExtremaObj = PlaceOLObj.Extrema
-		outlineMaxX = ExtremaObj.MaxX
-		outlineMinX = ExtremaObj.MinX
-		outlineMaxY = ExtremaObj.MaxY
-		outlineMinY = ExtremaObj.MinY
-		If outlineMaxX - outlineMinX > 3 Then
-			RefdesRotation = 0
-		Else 
-			If outlineMaxX - outlineMinX >= outlineMaxY - outlineMinY Then
-				RefdesRotation = 0
-			Else
-				RefdesRotation = 270
-			End If
-		End If
+		Set CompExtremaObj = PlaceOLObj.Extrema
+		outlineMaxX = CompExtremaObj.MaxX
+		outlineMinX = CompExtremaObj.MinX
+		outlineMaxY = CompExtremaObj.MaxY
+		outlineMinY = CompExtremaObj.MinY
 	End If
 	
 	Set FLTextColl = componentObj.FabricationLayerTexts(epcbFabAssembly)
@@ -63,6 +54,17 @@ For Each componentObj In componentColl
 			Set textFormatObj = FLTextObj.Format
 			textFormatObj.HorizontalJust = epcbJustifyHCenter
 			textFormatObj.VerticalJust = epcbJustifyVCenter
+			
+			If outlineMaxX - outlineMinX > FLTextObj.Extrema.MaxX - FLTextObj.Extrema.MinX Then
+				RefdesRotation = 0
+			Else 
+				If outlineMaxX - outlineMinX >= outlineMaxY - outlineMinY Then
+					RefdesRotation = 0
+				Else
+					RefdesRotation = 270
+				End If
+			End If
+			
 			textFormatObj.Orientation = RefdesRotation			
 			FLTextObj.PositionX = componentObj.CenterX
 			FLTextObj.PositionY = componentObj.CenterY
@@ -101,5 +103,6 @@ Function ValidateServer(docObj)
 	End If
 
 End Function
+
 
 
